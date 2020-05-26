@@ -38,7 +38,7 @@ bim --encode-image image.jpg image.jpg.b64
 bim --decode-image image.jpg.b64 image.jpg
 bim --encode-image image.png image.png.b64
 bim --decode-image image.png.b64 image.png
-bim --encode-document document.html document.html
+bim --encode-document document.html mail.html
 ```
 
 ## Version

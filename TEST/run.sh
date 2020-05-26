@@ -8,4 +8,4 @@ set -x
 ../bim --decode-image OUT/sea.jpg.b64 OUT/sea.jpg
 ../bim --encode-image street.png OUT/street.png.b64
 ../bim --decode-image OUT/street.png.b64 OUT/street.png
-../bim --encode-document document.html OUT/document.html
+../bim --encode-document document.html OUT/mail.html
