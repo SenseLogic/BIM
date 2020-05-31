@@ -27,6 +27,12 @@ import std.file : read, readText, write, FileException;
 import std.stdio : writeln;
 import std.string : endsWith, join, split, startsWith;
 
+// -- VARIABLES
+
+string
+    InputMediaFolderPath,
+    OutputMediaFolderPath;
+
 // -- FUNCTIONS
 
 void PrintError(
@@ -223,7 +229,7 @@ string GetEncodedDocumentFileText(
 
         if ( part_array.length > 0 )
         {
-            part_array[ 0 ] = GetEncodedImageFileText( part_array[ 0 ] );
+            part_array[ 0 ] = GetEncodedImageFileText( InputMediaFolderPath ~ part_array[ 0 ] );
             section_array[ section_index ] = part_array.join( '"' );
         }
     }
@@ -279,31 +285,79 @@ void main(
 {
     argument_array = argument_array[ 1 .. $ ];
 
-    if ( argument_array.length == 3
+    InputMediaFolderPath = "";
+    OutputMediaFolderPath = "";
+
+    if ( argument_array.length >= 2
+         && argument_array[ 0 ] == "--media-folder"
+         && argument_array[ 1 ].endsWith( '/' ) )
+    {
+        InputMediaFolderPath = argument_array[ 1 ];
+        OutputMediaFolderPath = argument_array[ 1 ];
+
+        argument_array = argument_array[ 2 .. $ ];
+    }
+    else if ( argument_array.length >= 2
+         && argument_array[ 0 ] == "--input-media-folder"
+         && argument_array[ 1 ].endsWith( '/' ) )
+    {
+        InputMediaFolderPath = argument_array[ 1 ];
+
+        argument_array = argument_array[ 2 .. $ ];
+    }
+    else if ( argument_array.length >= 2
+         && argument_array[ 0 ] == "--output-media-folder"
+         && argument_array[ 1 ].endsWith( '/' ) )
+    {
+        OutputMediaFolderPath = argument_array[ 1 ];
+
+        argument_array = argument_array[ 2 .. $ ];
+    }
+    else if ( argument_array.length >= 3
          && argument_array[ 0 ] == "--encode-file" )
     {
-        EncodeFile( argument_array[ 1 ], argument_array[ 2 ] );
+        EncodeFile(
+            InputMediaFolderPath ~ argument_array[ 1 ],
+            OutputMediaFolderPath ~ argument_array[ 2 ]
+            );
+
+        argument_array = argument_array[ 3 .. $ ];
     }
-    else if ( argument_array.length == 3
+    else if ( argument_array.length >= 3
               && ( argument_array[ 0 ] == "--decode-file"
                    || argument_array[ 0 ] == "--decode-image" ) )
     {
-        DecodeFile( argument_array[ 1 ], argument_array[ 2 ] );
+        DecodeFile(
+            InputMediaFolderPath ~ argument_array[ 1 ],
+            OutputMediaFolderPath ~ argument_array[ 2 ]
+            );
+
+        argument_array = argument_array[ 3 .. $ ];
     }
-    else if ( argument_array.length == 3
+    else if ( argument_array.length >= 3
               && argument_array[ 0 ] == "--encode-image" )
     {
-        EncodeImage( argument_array[ 1 ], argument_array[ 2 ] );
+        EncodeImage(
+            InputMediaFolderPath ~ argument_array[ 1 ],
+            OutputMediaFolderPath ~ argument_array[ 2 ]
+            );
+
+        argument_array = argument_array[ 3 .. $ ];
     }
-    else if ( argument_array.length == 3
+    else if ( argument_array.length >= 3
               && argument_array[ 0 ] == "--encode-document" )
     {
-        EncodeDocument( argument_array[ 1 ], argument_array[ 2 ] );
+        EncodeDocument(
+            argument_array[ 1 ],
+            argument_array[ 2 ]
+            );
+
+        argument_array = argument_array[ 3 .. $ ];
     }
     else
     {
         writeln( "Usage :" );
-        writeln( "    bim <option> <input_file> <output_file>" );
+        writeln( "    bim <options>" );
         writeln( "Examples :" );
         writeln( "    bim --encode-file file.bin file.bin.b64" );
         writeln( "    bim --decode-file file.bin.b64 file.bin" );
@@ -312,6 +366,7 @@ void main(
         writeln( "    bim --encode-image image.png image.png.b64" );
         writeln( "    bim --decode-image image.png.b64 image.png" );
         writeln( "    bim --encode-document document.html mail.html" );
+        writeln( "    bim --media-folder MEDIA_FOLDER/ --encode-document document.html mail.html" );
 
         Abort( "Invalid arguments : " ~ argument_array.to!string() );
     }
