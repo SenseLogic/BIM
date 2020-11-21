@@ -25,13 +25,14 @@ import std.base64;
 import std.conv : to;
 import std.file : read, readText, write, FileException;
 import std.stdio : writeln;
-import std.string : endsWith, join, split, startsWith;
+import std.string : endsWith, indexOf, join, replace, split, startsWith;
 
 // -- VARIABLES
 
 string
     InputMediaFolderPath,
-    OutputMediaFolderPath;
+    OutputMediaFolderPath,
+    OutputMediaPrefix;
 
 // -- FUNCTIONS
 
@@ -152,11 +153,50 @@ void WriteText(
 
 // ~~
 
+string GetFileLabel(
+    string file_path
+    )
+{
+    string
+        file_name;
+
+    file_name = file_path.replace( '\\', '/' ).split( '/' )[ $ - 1 ];
+
+    if ( file_name.indexOf( '.' ) >= 0 )
+    {
+        return file_name.split( '.' )[ $ - 2 ];
+    }
+    else
+    {
+        return file_name;
+    }
+}
+
+// ~~
+
+ubyte[] GetDecodedByteArray(
+    string text
+    )
+{
+    return Base64.decode( text );
+}
+
+// ~~
+
+string GetEncodedText(
+    ubyte[] byte_array
+    )
+{
+    return Base64.encode( byte_array );
+}
+
+// ~~
+
 string GetEncodedFileText(
     string file_path
     )
 {
-    return Base64.encode( ReadByteArray( file_path ) );
+    return GetEncodedText( ReadByteArray( file_path ) );
 }
 
 // ~~
@@ -179,7 +219,7 @@ ubyte[] GetDecodedFileByteArray(
         file_text = file_text[ 22 .. $ ];
     }
 
-    return Base64.decode( file_text );
+    return GetDecodedByteArray( file_text );
 }
 
 // ~~
@@ -239,6 +279,67 @@ string GetEncodedDocumentFileText(
 
 // ~~
 
+string GetDecodedDocumentFileText(
+    string document_file_path
+    )
+{
+    long
+        image_index,
+        section_index;
+    string
+        document_file_text,
+        image_extension,
+        image_prefix;
+    string[]
+        image_extension_array,
+        image_prefix_array,
+        part_array,
+        section_array;
+    ubyte[]
+        image_file_byte_array;
+
+    if ( OutputMediaPrefix == "" )
+    {
+        OutputMediaPrefix = GetFileLabel( document_file_path ) ~ '_';
+    }
+
+    document_file_text = ReadText( document_file_path );
+
+    image_prefix_array = [ "data:image/jpeg;base64,", "data:image/png;base64," ];
+    image_extension_array = [ ".jpg", ".png" ];
+    image_index = 0;
+
+    foreach ( image_format_index; 0 .. 2 )
+    {
+        image_prefix = image_prefix_array[ image_format_index ];
+        image_extension = image_extension_array[ image_format_index ];
+
+        section_array = document_file_text.split( image_prefix );
+
+        for ( section_index = 1;
+              section_index < section_array.length;
+              ++section_index )
+        {
+            part_array = section_array[ section_index ].split( '"' );
+
+            if ( part_array.length > 0 )
+            {
+                ++image_index;
+                image_file_byte_array = GetDecodedByteArray( part_array[ 0 ] );
+                part_array[ 0 ] = OutputMediaPrefix ~ image_index.to!string() ~ image_extension;
+                section_array[ section_index ] = part_array.join( '"' );
+                WriteByteArray( OutputMediaFolderPath ~ part_array[ 0 ], image_file_byte_array );
+            }
+        }
+
+        document_file_text = section_array.join( "" );
+    }
+
+    return document_file_text;
+}
+
+// ~~
+
 void EncodeFile(
     string input_file_path,
     string output_file_path
@@ -279,82 +380,125 @@ void EncodeDocument(
 
 // ~~
 
+void DecodeDocument(
+    string input_file_path,
+    string output_file_path
+    )
+{
+    WriteText( output_file_path, GetDecodedDocumentFileText( input_file_path ) );
+}
+
+// ~~
+
 void main(
     string[] argument_array
     )
 {
+    string
+        option;
+
     argument_array = argument_array[ 1 .. $ ];
 
     InputMediaFolderPath = "";
     OutputMediaFolderPath = "";
+    OutputMediaPrefix = "";
 
-    if ( argument_array.length >= 2
-         && argument_array[ 0 ] == "--media-folder"
-         && argument_array[ 1 ].endsWith( '/' ) )
+    while ( argument_array.length >= 1
+            && argument_array[ 0 ].startsWith( "--" ) )
     {
-        InputMediaFolderPath = argument_array[ 1 ];
-        OutputMediaFolderPath = argument_array[ 1 ];
+        option = argument_array[ 0 ];
+        argument_array = argument_array[ 1 .. $ ];
 
-        argument_array = argument_array[ 2 .. $ ];
-    }
-    else if ( argument_array.length >= 2
-         && argument_array[ 0 ] == "--input-media-folder"
-         && argument_array[ 1 ].endsWith( '/' ) )
-    {
-        InputMediaFolderPath = argument_array[ 1 ];
+        if ( option == "--media-folder"
+             && argument_array.length >= 1
+             && argument_array[ 0 ].endsWith( '/' ) )
+        {
+            InputMediaFolderPath = argument_array[ 0 ];
+            OutputMediaFolderPath = argument_array[ 0 ];
 
-        argument_array = argument_array[ 2 .. $ ];
-    }
-    else if ( argument_array.length >= 2
-         && argument_array[ 0 ] == "--output-media-folder"
-         && argument_array[ 1 ].endsWith( '/' ) )
-    {
-        OutputMediaFolderPath = argument_array[ 1 ];
+            argument_array = argument_array[ 1 .. $ ];
+        }
+        else if ( option == "--input-media-folder"
+                  && argument_array.length >= 1
+                  && argument_array[ 0 ].endsWith( '/' ) )
+        {
+            InputMediaFolderPath = argument_array[ 0 ];
 
-        argument_array = argument_array[ 2 .. $ ];
-    }
-    else if ( argument_array.length >= 3
-         && argument_array[ 0 ] == "--encode-file" )
-    {
-        EncodeFile(
-            InputMediaFolderPath ~ argument_array[ 1 ],
-            OutputMediaFolderPath ~ argument_array[ 2 ]
-            );
+            argument_array = argument_array[ 1 .. $ ];
+        }
+        else if ( option == "--output-media-folder"
+                  && argument_array.length >= 1
+                  && argument_array[ 0 ].endsWith( '/' ) )
+        {
+            OutputMediaFolderPath = argument_array[ 0 ];
 
-        argument_array = argument_array[ 3 .. $ ];
-    }
-    else if ( argument_array.length >= 3
-              && ( argument_array[ 0 ] == "--decode-file"
-                   || argument_array[ 0 ] == "--decode-image" ) )
-    {
-        DecodeFile(
-            InputMediaFolderPath ~ argument_array[ 1 ],
-            OutputMediaFolderPath ~ argument_array[ 2 ]
-            );
+            argument_array = argument_array[ 1 .. $ ];
+        }
+        else if ( option == "--media-prefix"
+                  && argument_array.length >= 1 )
+        {
+            OutputMediaPrefix = argument_array[ 0 ];
 
-        argument_array = argument_array[ 3 .. $ ];
-    }
-    else if ( argument_array.length >= 3
-              && argument_array[ 0 ] == "--encode-image" )
-    {
-        EncodeImage(
-            InputMediaFolderPath ~ argument_array[ 1 ],
-            OutputMediaFolderPath ~ argument_array[ 2 ]
-            );
+            argument_array = argument_array[ 1 .. $ ];
+        }
+        else if ( option == "--encode-file"
+                  && argument_array.length >= 2 )
+        {
+            EncodeFile(
+                InputMediaFolderPath ~ argument_array[ 0 ],
+                OutputMediaFolderPath ~ argument_array[ 1 ]
+                );
 
-        argument_array = argument_array[ 3 .. $ ];
-    }
-    else if ( argument_array.length >= 3
-              && argument_array[ 0 ] == "--encode-document" )
-    {
-        EncodeDocument(
-            argument_array[ 1 ],
-            argument_array[ 2 ]
-            );
+            argument_array = argument_array[ 2 .. $ ];
+        }
+        else if ( ( option == "--decode-file"
+                       || option == "--decode-image" )
+                  && argument_array.length >= 2 )
+        {
+            DecodeFile(
+                InputMediaFolderPath ~ argument_array[ 0 ],
+                OutputMediaFolderPath ~ argument_array[ 1 ]
+                );
 
-        argument_array = argument_array[ 3 .. $ ];
+            argument_array = argument_array[ 2 .. $ ];
+        }
+        else if ( option == "--encode-image"
+                  && argument_array.length >= 2 )
+        {
+            EncodeImage(
+                InputMediaFolderPath ~ argument_array[ 0 ],
+                OutputMediaFolderPath ~ argument_array[ 1 ]
+                );
+
+            argument_array = argument_array[ 2 .. $ ];
+        }
+        else if ( option == "--encode-document"
+                  && argument_array.length >= 2 )
+        {
+            EncodeDocument(
+                argument_array[ 0 ],
+                argument_array[ 1 ]
+                );
+
+            argument_array = argument_array[ 2 .. $ ];
+        }
+        else if ( option == "--decode-document"
+                  && argument_array.length >= 2 )
+        {
+            DecodeDocument(
+                argument_array[ 0 ],
+                argument_array[ 1 ]
+                );
+
+            argument_array = argument_array[ 2 .. $ ];
+        }
+        else
+        {
+            break;
+        }
     }
-    else
+
+    if ( argument_array.length > 0 )
     {
         writeln( "Usage :" );
         writeln( "    bim <options>" );
@@ -365,8 +509,9 @@ void main(
         writeln( "    bim --decode-image image.jpg.b64 image.jpg" );
         writeln( "    bim --encode-image image.png image.png.b64" );
         writeln( "    bim --decode-image image.png.b64 image.png" );
-        writeln( "    bim --encode-document document.html mail.html" );
-        writeln( "    bim --media-folder MEDIA_FOLDER/ --encode-document document.html mail.html" );
+        writeln( "    bim --encode-document mail.html inline_mail.html" );
+        writeln( "    bim --media-folder MEDIA_FOLDER/ --encode-document mail.html inline_mail.html" );
+        writeln( "    bim --media-folder MEDIA_FOLDER/ --decode-document inline_mail.html mail.html" );
 
         Abort( "Invalid arguments : " ~ argument_array.to!string() );
     }

@@ -2,7 +2,7 @@
 
 # Bim
 
-Base64 image and document converter.
+Base64 document encoder and decoder.
 
 ## Installation
 
@@ -31,6 +31,7 @@ bim <options>
 --encode-image : encode a Base64 image
 --decode-image : decode a Base64 image
 --encode-document : encode a Base64 document
+--decode-document : decode a Base64 document
 ```
 
 ### Examples
@@ -42,8 +43,9 @@ bim --encode-image image.jpg image.jpg.b64
 bim --decode-image image.jpg.b64 image.jpg
 bim --encode-image image.png image.png.b64
 bim --decode-image image.png.b64 image.png
-bim --encode-document document.html mail.html
-bim --media-folder MEDIA_FOLDER/ --encode-document document.html mail.html
+bim --encode-document mail.html inline_mail.html
+bim --media-folder MEDIA_FOLDER/ --encode-document mail.html inline_mail.html
+bim --media-folder MEDIA_FOLDER/ --encode-document inline_mail.html mail.html
 ```
 
 ## Version

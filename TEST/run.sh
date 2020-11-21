@@ -8,4 +8,5 @@ set -x
 ../bim --decode-image OUT/sea.jpg.b64 OUT/sea.jpg
 ../bim --encode-image IN/street.png OUT/street.png.b64
 ../bim --decode-image OUT/street.png.b64 OUT/street.png
-../bim --media-folder IN/ --encode-document IN/document.html OUT/mail.html
+../bim --media-folder IN/ --encode-document IN/mail.html OUT/inline_mail.html
+../bim --media-folder OUT/ --decode-document IN/inline_mail.html OUT/mail.html
