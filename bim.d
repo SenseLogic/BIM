@@ -23,7 +23,7 @@
 import core.stdc.stdlib : exit;
 import std.base64;
 import std.conv : to;
-import std.file : read, readText, write, FileException;
+import std.file : read, readText, write;
 import std.stdio : writeln;
 import std.string : endsWith, indexOf, join, replace, split, startsWith;
 
@@ -58,11 +58,11 @@ void Abort(
 
 void Abort(
     string message,
-    FileException file_exception
+    Exception exception
     )
 {
     PrintError( message );
-    PrintError( file_exception.msg );
+    PrintError( exception.msg );
 
     exit( -1 );
 }
@@ -82,9 +82,9 @@ ubyte[] ReadByteArray(
     {
         file_byte_array = cast( ubyte[] )file_path.read();
     }
-    catch ( FileException file_exception )
+    catch ( Exception exception )
     {
-        Abort( "Can't read file : " ~ file_path, file_exception );
+        Abort( "Can't read file : " ~ file_path, exception );
     }
 
     return file_byte_array;
@@ -103,9 +103,9 @@ void WriteByteArray(
     {
         file_path.write( file_byte_array );
     }
-    catch ( FileException file_exception )
+    catch ( Exception exception )
     {
-        Abort( "Can't write file : " ~ file_path, file_exception );
+        Abort( "Can't write file : " ~ file_path, exception );
     }
 }
 
@@ -124,9 +124,9 @@ string ReadText(
     {
         file_text = file_path.readText();
     }
-    catch ( FileException file_exception )
+    catch ( Exception exception )
     {
-        Abort( "Can't read file : " ~ file_path, file_exception );
+        Abort( "Can't read file : " ~ file_path, exception );
     }
 
     return file_text;
@@ -145,9 +145,9 @@ void WriteText(
     {
         file_path.write( file_text );
     }
-    catch ( FileException file_exception )
+    catch ( Exception exception )
     {
-        Abort( "Can't write file : " ~ file_path, file_exception );
+        Abort( "Can't write file : " ~ file_path, exception );
     }
 }
 
