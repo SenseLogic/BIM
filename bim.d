@@ -218,6 +218,10 @@ ubyte[] GetDecodedFileByteArray(
     {
         file_text = file_text[ 22 .. $ ];
     }
+    else if ( file_text.startsWith( "data:image/gif;base64," ) )
+    {
+        file_text = file_text[ 22 .. $ ];
+    }
 
     return GetDecodedByteArray( file_text );
 }
@@ -236,6 +240,10 @@ string GetEncodedImageFileText(
     else if ( image_file_path.endsWith( ".png" ) )
     {
         return "data:image/png;base64," ~ GetEncodedFileText( image_file_path );
+    }
+    else if ( image_file_path.endsWith( ".gif" ) )
+    {
+        return "data:image/gif;base64," ~ GetEncodedFileText( image_file_path );
     }
     else
     {
@@ -305,8 +313,8 @@ string GetDecodedDocumentFileText(
 
     document_file_text = ReadText( document_file_path );
 
-    image_prefix_array = [ "data:image/jpeg;base64,", "data:image/png;base64," ];
-    image_extension_array = [ ".jpg", ".png" ];
+    image_prefix_array = [ "data:image/jpeg;base64,", "data:image/png;base64,", "data:image/gif;base64," ];
+    image_extension_array = [ ".jpg", ".png", ".gif" ];
     image_index = 0;
 
     foreach ( image_format_index; 0 .. 2 )

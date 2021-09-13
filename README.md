@@ -43,6 +43,8 @@ bim --encode-image image.jpg image.jpg.b64
 bim --decode-image image.jpg.b64 image.jpg
 bim --encode-image image.png image.png.b64
 bim --decode-image image.png.b64 image.png
+bim --encode-image image.gif image.gif.b64
+bim --decode-image image.gif.b64 image.gif
 bim --encode-document mail.html inline_mail.html
 bim --media-folder MEDIA_FOLDER/ --encode-document mail.html inline_mail.html
 bim --media-folder MEDIA_FOLDER/ --encode-document inline_mail.html mail.html
