@@ -254,35 +254,48 @@ string GetEncodedImageFileText(
 // ~~
 
 string GetEncodedDocumentFileText(
-    string document_file_path
+    string document_file_text,
+    string image_file_path_prefix,
+    string image_file_path_suffix
     )
 {
     long
         section_index;
-    string
-        document_file_text;
     string[]
         part_array,
         section_array;
 
-    document_file_text = ReadText( document_file_path );
-
-    section_array = document_file_text.split( "src=\"" );
+    section_array = document_file_text.split( image_file_path_prefix );
 
     for ( section_index = 1;
           section_index < section_array.length;
           ++section_index )
     {
-        part_array = section_array[ section_index ].split( '"' );
+        part_array = section_array[ section_index ].split( image_file_path_suffix );
 
         if ( part_array.length > 0 )
         {
             part_array[ 0 ] = GetEncodedImageFileText( InputMediaFolderPath ~ part_array[ 0 ] );
-            section_array[ section_index ] = part_array.join( '"' );
+            section_array[ section_index ] = part_array.join( image_file_path_suffix );
         }
     }
 
-    return section_array.join( "src=\"" );
+    return section_array.join( image_file_path_prefix );
+}
+
+// ~~
+
+string GetEncodedDocumentFileText(
+    string document_file_path
+    )
+{
+    return 
+        ReadText( document_file_path )
+            .GetEncodedDocumentFileText( "src=\"", "\"" )
+            .GetEncodedDocumentFileText( "url('", "')" )
+            .GetEncodedDocumentFileText( "url(\"", "\")" )
+            .GetEncodedDocumentFileText( "url( '", "' )" )
+            .GetEncodedDocumentFileText( "url( \"", "\" )" );
 }
 
 // ~~
@@ -317,7 +330,7 @@ string GetDecodedDocumentFileText(
     image_extension_array = [ ".jpg", ".png", ".gif" ];
     image_index = 0;
 
-    foreach ( image_format_index; 0 .. 2 )
+    foreach ( image_format_index; 0 .. 3 )
     {
         image_prefix = image_prefix_array[ image_format_index ];
         image_extension = image_extension_array[ image_format_index ];
