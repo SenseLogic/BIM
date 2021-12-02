@@ -47,7 +47,7 @@ bim --encode-image image.gif image.gif.b64
 bim --decode-image image.gif.b64 image.gif
 bim --encode-document mail.html inline_mail.html
 bim --media-folder MEDIA_FOLDER/ --encode-document mail.html inline_mail.html
-bim --media-folder MEDIA_FOLDER/ --encode-document inline_mail.html mail.html
+bim --media-folder MEDIA_FOLDER/ --decode-document inline_mail.html mail.html
 ```
 
 ## Version
