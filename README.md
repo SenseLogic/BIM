@@ -26,12 +26,12 @@ bim <options>
 --media-folder : use this folder to read and write media files
 --input-media-folder : use this folder to read media files
 --output-media-folder : use this folder to write media files
---encode-file : encode a Base64 file
---decode-file : encode a Base64 file
---encode-image : encode a Base64 image
---decode-image : decode a Base64 image
---encode-document : encode a Base64 document
---decode-document : decode a Base64 document
+--encode-file : encode a file
+--decode-file : encode a file
+--encode-image : encode an image
+--decode-image : decode an image
+--encode-document : encode CSS and HTML inline images of a document
+--decode-document : decode CSS and HTML inline images of a document
 ```
 
 ### Examples
