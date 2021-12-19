@@ -23,15 +23,19 @@ bim <options>
 ### Options
 
 ```bash
---media-folder : use this folder to read and write media files
---input-media-folder : use this folder to read media files
---output-media-folder : use this folder to write media files
---encode-file : encode a file
---decode-file : encode a file
---encode-image : encode an image
---decode-image : decode an image
---encode-document : encode CSS and HTML inline images of a document
---decode-document : decode CSS and HTML inline images of a document
+--input-media-folder <input media folder path> : use this folder to read media files
+--output-media-folder <output media folder path> : use this folder to write media files
+--media-folder <media folder path> : use this folder to read and write media files
+--encode-characters : encode non-ASCII characters of a document
+--decode-characters : decode non-ASCII characters of a document
+--encode-file <input file path> <output file path> : encode a file
+--decode-file <input file path> <output file path> : encode a file
+--encode-image <input file path> <output file path> : encode an image
+--decode-image <input file path> <output file path> : decode an image
+--encode-document <input file path> <output file path> : encode CSS and HTML inline images of a document
+--decode-document <input file path> <output file path> : decode CSS and HTML inline images of a document
+--encode-document-characters <input file path> <output file path> : encode CSS and HTML inline images of a document
+--decode-document-characters <input file path> <output file path> : decode CSS and HTML inline images of a document
 ```
 
 ### Examples

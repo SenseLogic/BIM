@@ -18,5 +18,7 @@ set -x
 ../bim --decode-image OUT/street.png.b64 OUT/street.png
 ../bim --encode-image IN/banana.gif OUT/banana.gif.b64
 ../bim --decode-image OUT/banana.gif.b64 OUT/banana.gif
-../bim --media-folder IN/ --encode-document IN/mail.html OUT/inline_mail.html
-../bim --media-folder OUT/ --decode-document IN/inline_mail.html OUT/mail.html
+../bim --media-folder IN/ --encode-characters --encode-document IN/mail.html OUT/inline_mail.html
+../bim --media-folder OUT/ --decode-characters --decode-document IN/inline_mail.html OUT/mail.html
+../bim --encode-document-characters IN/document.html OUT/encoded_document.html
+../bim --decode-document-characters OUT/encoded_document.html OUT/document.html
