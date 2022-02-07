@@ -17,7 +17,7 @@ dmd -m64 bim.d
 ## Command line
 
 ```bash
-bim <options>
+bim [options]
 ```
 
 ### Options

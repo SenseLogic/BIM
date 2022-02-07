@@ -665,7 +665,7 @@ void main(
     if ( argument_array.length > 0 )
     {
         writeln( "Usage :" );
-        writeln( "    bim <options>" );
+        writeln( "    bim [options]" );
         writeln( "Examples :" );
         writeln( "    bim --encode-file file.bin file.bin.b64" );
         writeln( "    bim --decode-file file.bin.b64 file.bin" );
