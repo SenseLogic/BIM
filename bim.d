@@ -25,7 +25,7 @@ import std.base64;
 import std.conv : to;
 import std.file : read, readText, write;
 import std.stdio : writeln;
-import std.string : endsWith, indexOf, join, replace, split, startsWith;
+import std.string : endsWith, join, lastIndexOf, replace, split, startsWith;
 
 // -- VARIABLES
 
@@ -160,14 +160,18 @@ string GetFileLabel(
     string file_path
     )
 {
+    long
+        dot_character_index;
     string
         file_name;
 
     file_name = file_path.replace( '\\', '/' ).split( '/' )[ $ - 1 ];
+    
+    dot_character_index = file_name.lastIndexOf( '.' );
 
-    if ( file_name.indexOf( '.' ) >= 0 )
+    if ( dot_character_index >= 0 )
     {
-        return file_name.split( '.' )[ $ - 2 ];
+        return file_name[ 0 .. dot_character_index ];
     }
     else
     {
